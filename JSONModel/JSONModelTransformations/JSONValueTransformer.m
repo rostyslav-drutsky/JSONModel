@@ -179,7 +179,17 @@ extern BOOL isNull(id value)
 #pragma mark - string <-> number
 -(NSNumber*)NSNumberFromNSString:(NSString*)string
 {
-    return [NSNumber numberWithDouble:[string doubleValue]];
+    BOOL isDouble = [string rangeOfString:@"."].location != NSNotFound;
+    BOOL isSigned = [string rangeOfString:@"-"].location != NSNotFound;
+    if (isDouble) {
+        return [NSNumber numberWithDouble: [string doubleValue]];
+    } else
+    if (isSigned) {
+        return [NSNumber numberWithLongLong:[string longLongValue]];
+    } else {
+        unsigned long long val = strtoull([string UTF8String], NULL, 10);
+        return [NSNumber numberWithUnsignedLongLong:val];
+    }
 }
 
 -(NSString*)NSStringFromNSNumber:(NSNumber*)number
